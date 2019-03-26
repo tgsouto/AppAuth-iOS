@@ -5,7 +5,6 @@ Pod::Spec.new do |s|
   s.summary      = "AppAuth for iOS and macOS is a client SDK for communicating with OAuth 2.0 and OpenID Connect providers."
 
   s.description  = <<-DESC
-
 AppAuth for iOS and macOS is a client SDK for communicating with [OAuth 2.0]
 (https://tools.ietf.org/html/rfc6749) and [OpenID Connect]
 (http://openid.net/specs/openid-connect-core-1_0.html) providers. It strives to
@@ -13,10 +12,8 @@ directly map the requests and responses of those specifications, while following
 the idiomatic style of the implementation language. In addition to mapping the
 raw protocol flows, convenience methods are available to assist with common
 tasks like performing an action with fresh tokens.
-
 It follows the OAuth 2.0 for Native Apps best current practice
 ([RFC 8252](https://tools.ietf.org/html/rfc8252)).
-
                    DESC
 
   s.homepage     = "https://openid.github.io/AppAuth-iOS"
@@ -33,16 +30,27 @@ It follows the OAuth 2.0 for Native Apps best current practice
   s.platforms    = { :ios => "7.0", :osx => "10.9", :watchos => "2.0", :tvos => "9.0" }
 
   s.source       = { :git => "https://github.com/openid/AppAuth-iOS.git", :tag => s.version }
-
-  s.source_files = "Source/*.{h,m}"
   s.requires_arc = true
 
-  # iOS
-  s.ios.source_files      = "Source/iOS/**/*.{h,m}"
-  s.ios.deployment_target = "7.0"
-  s.ios.frameworks        = "SafariServices", "AuthenticationServices"
+  # Subspec for the core AppAuth library classes only, suitable for extensions.
+  s.subspec 'Core' do |core|
+     core.source_files = "Source/*.{h,m}"
+     core.exclude_files = "Source/AppAuth.h"
+  end
 
-  # macOS
-  s.osx.source_files = "Source/macOS/**/*.{h,m}"
-  s.osx.deployment_target = '10.9'
+  # Subspec for the full AppAuth library, including platform-dependant external user agents.
+  s.subspec 'ExternalUserAgent' do |externalUserAgent|
+
+    externalUserAgent.source_files = "Source/*.{h,m}"
+    
+    # iOS
+    externalUserAgent.ios.source_files      = "Source/iOS/**/*.{h,m}"
+    externalUserAgent.ios.deployment_target = "7.0"
+    externalUserAgent.ios.frameworks        = "SafariServices"
+    externalUserAgent.ios.weak_frameworks   = "AuthenticationServices"
+
+    # macOS
+    externalUserAgent.osx.source_files = "Source/macOS/**/*.{h,m}"
+    externalUserAgent.osx.deployment_target = '10.9'    
+  end
 end
